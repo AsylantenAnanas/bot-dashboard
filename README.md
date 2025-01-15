@@ -1,227 +1,264 @@
-# Bot-Dashboard
-
-**Express-React Application with Socket.io Integration**
+# Minecraft Bot Dashboard
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Node.js](https://img.shields.io/badge/node.js-14.17.0-brightgreen.svg)
-![React](https://img.shields.io/badge/react-17.0.2-blue.svg)
+![Node.js](https://img.shields.io/badge/node.js-v14.0.0-green.svg)
+![React](https://img.shields.io/badge/react-v17.0.2-blue.svg)
 
 ## Table of Contents
 
 - [Introduction](#introduction)
 - [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Project Structure](#project-structure)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
 - [Installation](#installation)
-  - [Prerequisites](#prerequisites)
-  - [Server Setup](#server-setup)
-  - [Client Setup](#client-setup)
+- [Environment Variables](#environment-variables)
 - [Running the Application](#running-the-application)
+- [API Endpoints](#api-endpoints)
+- [Frontend](#frontend)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
 
 ## Introduction
 
-Welcome to the **Bot-Dashboard with Socket.io Integration**! This project is a full-stack web application built with an Express.js backend and a React frontend. It leverages Socket.io for real-time communication, enabling dynamic interactions between the server and clients. The application includes user authentication, account management, server and client handling, and real-time updates.
+**Minecraft Bot Dashboard** is a comprehensive full-stack application designed to manage Minecraft bots efficiently. This application features a React-based frontend dashboard and an Express.js backend API, enabling users to create bots that can join Minecraft servers, perform specific tasks, and integrate advanced functionalities such as ChatGPT responses and autoshop modules. Leveraging Socket.io for real-time communication, the platform provides extensive control over bot behaviors through customizable hooks.
 
 ## Features
 
-- **User Authentication**: Secure login and logout functionality with session management.
-- **Account Management**: Create, update, and delete user accounts.
-- **Server Configuration**: Manage server settings, including hostname, version, and NPC configurations.
-- **Client Management**: Handle client bots with functionalities to start, stop, and rejoin bots.
-- **Real-Time Communication**: Utilize Socket.io for real-time updates on terminal messages and player statuses.
-- **Hooks Integration**: Add and manage hooks for client bots.
-- **Export Logs**: Download chat logs and export all client logs as HTML files.
-- **Admin Dashboard**: Comprehensive admin panel for managing categories, items, shops, clans, guides, and more.
-- **Responsive Frontend**: User-friendly interface built with React and Ant Design components.
+- **User Authentication**: Secure login and session management.
+- **Bot Management**: Create, start, stop, and monitor Minecraft bots.
+- **Server Configuration**: Manage Minecraft server details.
+- **Account Management**: Handle bot accounts with ease.
+- **Real-time Updates**: Receive live updates on bot activities and player lists via Socket.io.
+- **Hooks System**: Customize bot behavior by hooking into Mineflayer events.
+- **Module Integration**: Enhance bots with ChatGPT responses and autoshop modules.
+- **Chat and Logs**: Interact with bots through chat and export logs.
+- **Proxy Viewer**: Access bot viewers directly from the dashboard.
 
-## Technologies Used
+## Tech Stack
 
-- **Backend**:
-  - [Express.js](https://expressjs.com/)
-  - [Socket.io](https://socket.io/)
-  - [MySQL](https://www.mysql.com/)
-  - [Express-Session](https://www.npmjs.com/package/express-session)
-  - [HTTP-Proxy-Middleware](https://github.com/chimurai/http-proxy-middleware)
-  - [Cors](https://www.npmjs.com/package/cors)
+- **Frontend**: React, React Router
+- **Backend**: Express.js, Node.js
+- **Database**: MySQL
+- **Real-time Communication**: Socket.io
+- **Other Libraries**:
+  - `express-session` for session management
+  - `cors` for Cross-Origin Resource Sharing
+  - `http-proxy-middleware` for proxying requests
+  - `dotenv` for environment variable management
 
-- **Frontend**:
-  - [React](https://reactjs.org/)
-  - [React Router](https://reactrouter.com/)
-  - [Ant Design](https://ant.design/)
-  - [Axios](https://axios-http.com/)
+## Architecture
 
-## Project Structure
+The application follows a client-server architecture:
 
-```
-project-root/
-├── client/
-│   ├── build/
-│   ├── src/
-│   │   ├── api/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── App.jsx
-│   └── package.json
-├── server/
-│   ├── db/
-│   ├── hooksConfig.js
-│   ├── botManager.js
-│   ├── helper.js
-│   ├── server.js
-│   └── package.json
-├── .env
-├── README.md
-└── package.json
-```
-
-- **client/**: Contains the React frontend application.
-- **server/**: Contains the Express.js backend application.
-- **.env**: Environment variables for configuration.
-- **README.md**: Project documentation.
+- **Backend (Express.js)**: Handles API requests, manages bot lifecycles, interacts with the database, and serves the React frontend in production.
+- **Frontend (React)**: Provides a user-friendly dashboard for managing bots, servers, accounts, and viewing real-time data.
+- **Database (MySQL)**: Stores user data, accounts, server configurations, and client (bot) details.
+- **Real-time Communication (Socket.io)**: Facilitates real-time updates between the server and frontend.
 
 ## Installation
 
 ### Prerequisites
 
-Ensure you have the following installed on your machine:
+- **Node.js** (v14 or higher)
+- **npm** (v6 or higher)
+- **MySQL Database**
 
-- [Node.js](https://nodejs.org/en/) (v14 or higher)
-- [npm](https://www.npmjs.com/) (comes with Node.js)
-- [MySQL](https://www.mysql.com/) Database
+### Clone the Repository
 
-### Server Setup
+```bash
+git clone https://github.com/yourusername/minecraft-bot-dashboard.git
+cd minecraft-bot-dashboard
+```
 
-1. **Navigate to the server directory**:
+### Install Backend Dependencies
 
-   ```bash
-   cd server
-   ```
+```bash
+cd server
+npm install
+```
 
-2. **Install server dependencies**:
+### Install Frontend Dependencies
 
-   ```bash
-   npm install
-   ```
+```bash
+cd ../client
+npm install
+```
 
-3. **Configure Environment Variables**:
+## Environment Variables
 
-   Create a `.env` file in the `server/` directory and add the following:
+Create a `.env` file in the `server` directory with the following variables:
 
-   ```env
-   PORT=4000
-   DB_HOST=your_db_host
-   DB_USER=your_db_user
-   DB_PASSWORD=your_db_password
-   DB_NAME=your_db_name
-   SESSION_SECRET=your_session_secret
-   ```
+```env
+PORT=4000
+DB_HOST=your_database_host
+DB_USER=your_database_user
+DB_PASSWORD=your_database_password
+DB_NAME=your_database_name
+SESSION_SECRET=your_session_secret
+```
 
-4. **Set Up the Database**:
-
-   - Create a MySQL database using the name specified in `DB_NAME`.
-   - Import or create the necessary tables (`users`, `accounts`, `servers`, `clients`, etc.) as per your application requirements.
-
-### Client Setup
-
-1. **Navigate to the client directory**:
-
-   ```bash
-   cd client
-   ```
-
-2. **Install client dependencies**:
-
-   ```bash
-   npm install
-   ```
-
-3. **Configure Environment Variables**:
-
-   Update the a `axiosInstance.js` file in the `client/api/` directory to include your correct api endpoint
+**Replace the placeholders** with your actual database credentials and a strong session secret.
 
 ## Running the Application
 
-### Start the Server
+### Start the Backend Server
 
-1. **Navigate to the server directory**:
+```bash
+cd server
+npm start
+```
 
-   ```bash
-   cd server
-   ```
+The server will run on `http://localhost:4000`.
 
-2. **Start the server**:
+### Start the Frontend Development Server
 
-   ```bash
-   npm start
-   ```
+In a new terminal window:
 
-   The server will run on [http://localhost:4000](http://localhost:4000).
+```bash
+cd client
+npm start
+```
 
-### Start the Client
+The React app will run on `http://localhost:3000`.
 
-1. **Open a new terminal and navigate to the client directory**:
+### Build Frontend for Production
 
-   ```bash
-   cd client
-   ```
-
-2. **Start the React application**:
-
-   ```bash
-   npm start
-   ```
-
-   The React app will run on [http://localhost:3000](http://localhost:3000).
-
-### Build for Production
-
-To build the React frontend for production:
+To build the React app for production:
 
 ```bash
 cd client
 npm run build
 ```
 
-This will create a `build/` directory with optimized production files, which are served by the Express.js backend.
+The built files will be served by the Express server.
+
+## API Endpoints
+
+### Authentication
+
+- **POST** `/api/login`: Authenticate user with username and password.
+- **POST** `/api/logout`: Logout the current user.
+
+### Accounts
+
+- **GET** `/api/accounts`: Retrieve all accounts for the logged-in user.
+- **POST** `/api/accounts`: Create a new account.
+- **POST** `/api/accounts/:id`: Update an existing account.
+- **POST** `/api/accounts/:id/delete`: Delete an account.
+
+### Servers
+
+- **GET** `/api/servers`: Retrieve all server configurations.
+- **POST** `/api/servers`: Create a new server configuration.
+- **POST** `/api/servers/:id`: Update a server configuration.
+- **POST** `/api/servers/:id/delete`: Delete a server configuration.
+
+### Clients (Bots)
+
+- **GET** `/api/clients`: Retrieve all clients (bots) for the logged-in user.
+- **POST** `/api/clients`: Create a new client (bot).
+- **POST** `/api/clients/:clientId`: Update a client.
+- **GET** `/api/clients/:clientId`: Retrieve details of a specific client.
+- **POST** `/api/clients/:clientId/delete`: Delete a client.
+- **POST** `/api/clients/:clientId/start`: Start a bot.
+- **POST** `/api/clients/:clientId/stop`: Stop a bot.
+- **POST** `/api/clients/:clientId/rejoin`: Rejoin a bot.
+- **POST** `/api/clients/:clientId/chat`: Send a chat message to a bot.
+- **GET** `/api/clients/:clientId/messages`: Retrieve chat messages from a bot.
+- **GET** `/api/clients/:clientId/export`: Export chat logs.
+- **GET** `/api/clients/:clientId/players`: Retrieve the list of players on the server.
+- **GET** `/api/clients/:clientId/playerAmount`: Retrieve the number of players on the server.
+- **POST** `/api/clients/:clientId/hooks`: Set hooks for a client.
+- **GET** `/api/clients/:clientId/hooks`: Get hooks for a client.
+
+### Hooks
+
+- **GET** `/api/hooks/events`: Retrieve available hook events.
+- **GET** `/api/hooks/types`: Retrieve available hook types.
+
+### Export Logs
+
+- **GET** `/api/exportAllLogs`: Download logs for all clients.
+
+## Frontend
+
+The frontend is built with React and utilizes React Router for client-side routing. The main entry point is `client/src/App.js`, which defines the routes for the application:
+
+- `/` and `/login`: **Login Page**
+- `/dashboard`: **Dashboard Page**
+- `/accounts`: **Accounts Management Page**
+- `/servers`: **Servers Management Page**
+- `/clients`: **Clients (Bots) Management Page**
+- `/clients/:clientId`: **Client Details Page**
+
+### Main Frontend Files
+
+- **App.js**: Defines the main routes of the application.
+- **Pages**: Located in `client/src/pages/`, each page corresponds to a specific route.
+  - `LoginPage.js`
+  - `DashboardPage.js`
+  - `AccountsPage.js`
+  - `ServersPage.js`
+  - `ClientsPage.js`
+  - `ClientDetailsPage.js`
+
+### Styling
+
+The application uses CSS for styling. You can find the styles in the respective component files within the `client/src` directory. Feel free to customize the styles to match your preferences.
 
 ## Contributing
 
-Contributions are welcome! Please follow these steps:
+Contributions are welcome! Please follow these steps to contribute:
 
-1. **Fork the repository**
-2. **Create a new branch**
+1. **Fork the Repository**:
 
-   ```bash
-   git checkout -b feature/YourFeature
-   ```
+   Click the "Fork" button at the top right of the repository page.
 
-3. **Commit your changes**
+2. **Clone the Forked Repository**:
 
    ```bash
-   git commit -m "Add your feature"
+   git clone https://github.com/yourusername/minecraft-bot-dashboard.git
+   cd minecraft-bot-dashboard
    ```
 
-4. **Push to the branch**
+3. **Create a New Branch**:
 
    ```bash
-   git push origin feature/YourFeature
+   git checkout -b feature/YourFeatureName
    ```
 
-5. **Open a Pull Request**
+4. **Make Your Changes**:
 
-Please ensure your code follows the project's coding standards and includes relevant tests.
+   Implement your feature or fix.
+
+5. **Commit Your Changes**:
+
+   ```bash
+   git commit -m "Add YourFeatureName"
+   ```
+
+6. **Push to the Branch**:
+
+   ```bash
+   git push origin feature/YourFeatureName
+   ```
+
+7. **Open a Pull Request**:
+
+   Go to the original repository and click "Compare & pull request".
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE). You are free to use, modify, and distribute this project as per the license terms.
 
 ## Contact
 
-For any questions or suggestions, please contact [web.wizard](https://discord.com/users/279936883277168640) on Discord.
+For any inquiries or support, please contact:
+
+- **Discord**: web.wizard
+- **GitHub**: [AsylantenAnanas](https://github.com/AsylantenAnanas)
 
 ---
 
-*Happy Coding!*
+Feel free to customize this README further to better fit your project's specifics, such as adding screenshots, detailed setup instructions, or any other relevant information.
