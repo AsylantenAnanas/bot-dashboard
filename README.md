@@ -88,9 +88,9 @@ npm install
 
 ## Environment Variables
 
-Rename the a `.env.example` file in the `client` and `server` directory.
+Rename the `.env.example` file in the `client` and `server` directory.
 
-**Replace the placeholders** with your actual informations.
+**Replace the placeholders** with your actual information.
 
 ## Running the Application
 
