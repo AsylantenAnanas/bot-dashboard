@@ -198,7 +198,8 @@ The frontend is built with React and utilizes React Router for client-side routi
 ## TODO
 
 - Finish the server side code for the hooks
-- Add some structure to the server files 
+- Add some structure to the server files
+- Add Bedrock support
 - ...
 
 ## Contributing
