@@ -17,7 +17,6 @@
   - [Server Setup](#server-setup)
   - [Client Setup](#client-setup)
 - [Running the Application](#running-the-application)
-- [API Documentation](#api-documentation)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
