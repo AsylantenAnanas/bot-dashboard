@@ -198,6 +198,7 @@ The frontend is built with React and utilizes React Router for client-side routi
 ## TODO
 
 - Finish the server side code for the hooks
+- Fix prismarine viewer proxy
 - Add some structure to the server files
 - Add Bedrock support
 - ...
