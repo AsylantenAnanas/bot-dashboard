@@ -87,18 +87,9 @@ npm install
 
 ## Environment Variables
 
-Create a `.env` file in the `server` directory with the following variables:
+Rename the a `.env.example` file in the `client` and `server` directory.
 
-```env
-PORT=4000
-DB_HOST=your_database_host
-DB_USER=your_database_user
-DB_PASSWORD=your_database_password
-DB_NAME=your_database_name
-SESSION_SECRET=your_session_secret
-```
-
-**Replace the placeholders** with your actual database credentials and a strong session secret.
+**Replace the placeholders** with your actual informations.
 
 ## Running the Application
 
