@@ -21,20 +21,17 @@ const io = new Server(server, {
   }
 });
 
-// 1. Socket.io-Server initialisieren
 io.on('connection', (socket) => {
   socket.on('subscribeToTerminal', async (clientId) => {
     const messages = botManager.getMessages(clientId);
     socket.emit('terminalMessages', messages);
 
-    // Abonnieren des `messageUpdate`-Ereignisses für diesen ClientId
     const messageUpdateHandler = (newMessage) => {
       socket.emit('terminalMessagesUpdate', newMessage);
     };
 
     botManager.on(`messageUpdate:${clientId}`, messageUpdateHandler);
 
-    // Cleanup: Entferne den Event-Listener, wenn der Socket getrennt wird oder die Subscription aufgehoben wird
     socket.on('unsubscribeFromTerminal', () => {
       botManager.off(`messageUpdate:${clientId}`, messageUpdateHandler);
     });
@@ -74,13 +71,12 @@ io.on('connection', (socket) => {
 
 const PORT = 4000;
 
-// 2. Express-Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
-  name: 'sessionId', // Custom cookie name
+  name: 'sessionId',
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
@@ -173,7 +169,6 @@ app.get('/viewers/:clientId/:fileName', checkAuth, (req, res, next) => {
   proxy(req, res, next);
 });
 
-// Auth-Check Middleware
 function checkAuth(req, res, next) {
   if (req.session && req.session.loggedIn && req.session.userId) {
     req.userId = req.session.userId;
@@ -183,9 +178,6 @@ function checkAuth(req, res, next) {
   }
 }
 
-/* -------------------------
-   Login / Logout
-------------------------- */
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -218,9 +210,6 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
-/* -------------------------
-   Accounts
-------------------------- */
 app.get('/api/accounts', checkAuth, async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM accounts WHERE user_id = ?', [req.userId]);
@@ -253,7 +242,6 @@ app.post('/api/accounts/:id', checkAuth, async (req, res) => {
   const { id } = req.params;
   const { username, nickname } = req.body;
   try {
-    // Verify ownership
     const [existing] = await pool.query('SELECT * FROM accounts WHERE id = ? AND user_id = ?', [id, req.userId]);
     if (existing.length === 0) {
       return res.status(403).json({ error: 'Zugriff verweigert' });
@@ -286,11 +274,6 @@ app.post('/api/accounts/:id/delete', checkAuth, async (req, res) => {
   }
 });
 
-
-/* -------------------------
-   Servers
-------------------------- */
-// Serves as "Minecraft Server configuration"
 app.get('/api/servers', checkAuth, async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM servers');
@@ -348,9 +331,6 @@ app.post('/api/servers/:id/delete', checkAuth, async (req, res) => {
   }
 });
 
-/* -------------------------
-   Clients
-------------------------- */
 app.get('/api/clients', checkAuth, async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM clients WHERE user_id = ?', [req.userId]);
@@ -365,14 +345,12 @@ app.get('/api/clients', checkAuth, async (req, res) => {
   }
 });
 
-// Neue Client-Anlage: server_id und autorestart
 app.post('/api/clients', checkAuth, async (req, res) => {
   const { accountId, serverId, auth, blacklist, autorestart } = req.body;
   if (!accountId || !serverId) {
     return res.status(400).json({ error: 'accountId und serverId sind erforderlich' });
   }
   try {
-    // Verify that the account belongs to the user
     const [accountRows] = await pool.query('SELECT * FROM accounts WHERE id = ? AND user_id = ?', [accountId, req.userId]);
     if (accountRows.length === 0) {
       return res.status(403).json({ error: 'Ungültige accountId' });
@@ -473,11 +451,9 @@ app.get('/api/clients/:clientId', checkAuth, async (req, res) => {
   }
 });
 
-// Löschen
 app.post('/api/clients/:clientId/delete', checkAuth, async (req, res) => {
   const { clientId } = req.params;
   try {
-    // Verify ownership
     const [existing] = await pool.query('SELECT * FROM clients WHERE id = ? AND user_id = ?', [clientId, req.userId]);
     if (existing.length === 0) {
       return res.status(403).json({ error: 'Zugriff verweigert' });
@@ -492,32 +468,27 @@ app.post('/api/clients/:clientId/delete', checkAuth, async (req, res) => {
   }
 });
 
-/* --- Start, Stop, Rejoin --- */
 app.post('/api/clients/:clientId/start', checkAuth, async (req, res) => {
   const { clientId } = req.params;
   try {
-    // Hole Client
     const [clients] = await pool.query('SELECT * FROM clients WHERE id=?', [clientId]);
     if (clients.length === 0) {
       return res.status(403).json({ error: 'Zugriff verweigert' });
     }
-    const c = clients[0];
 
-    // Hole Account
+    const c = clients[0];
     const [accs] = await pool.query('SELECT * FROM accounts WHERE id=?', [c.account_id]);
     if (accs.length === 0) {
       return res.status(404).json({ error: 'Account nicht gefunden' });
     }
     const accountData = accs[0];
 
-    // Hole Server
     const [servers] = await pool.query('SELECT * FROM servers WHERE id=?', [c.server_id]);
     if (servers.length === 0) {
       return res.status(404).json({ error: 'Server nicht gefunden' });
     }
-    const serverConfig = servers[0];
 
-    // Blacklist -> Array
+    const serverConfig = servers[0];
     const blackArray = c.blacklist ? c.blacklist.split('\n').map(l => l.trim()).filter(Boolean) : [];
     const autoR = c.autorestart === 1;
 
@@ -573,7 +544,6 @@ app.post('/api/clients/:clientId/rejoin', checkAuth, async (req, res) => {
   }
 });
 
-/* --- Chat & Logs --- */
 app.post('/api/clients/:clientId/chat', checkAuth, (req, res) => {
   const { clientId } = req.params;
   const { message } = req.body;
@@ -589,18 +559,16 @@ app.get('/api/clients/:clientId/messages', checkAuth, async (req, res) => {
 
 app.get('/api/clients/:clientId/export', checkAuth, async (req, res) => {
   const { clientId } = req.params;
-  const botObj = botManager.bots[clientId]; // Assuming botManager.bots contains client data
+  const botObj = botManager.bots[clientId];
 
   if (!botObj) {
     return res.status(404).send('Client not found');
   }
 
-  const { status, messages } = botObj; // Adjust based on your data structure
+  const { status, messages } = botObj;
 
-  // Generate HTML content
   const htmlContent = generateClientLogHtml(clientId, status, messages);
 
-  // Set headers to prompt file download
   res.setHeader('Content-disposition', `attachment; filename=client_${clientId}_chatlog.html`);
   res.setHeader('Content-Type', 'text/html');
   
@@ -620,29 +588,24 @@ app.get('/api/clients/:clientId/playerAmount', checkAuth, async (req, res) => {
   res.json(playerAmount);
 }); 
 
-// Hooks
-// Hooks
 app.post('/api/clients/:clientId/hooks', async (req, res) => {
   const { clientId } = req.params;
   const { hooks } = req.body;
 
-  // Validate hooks structure
   if (!Array.isArray(hooks)) {
     return res.status(400).json({ error: 'Hooks must be an array.' });
   }
 
-  // Optional: Add more validation for each hook object
   for (const hook of hooks) {
     if (!hook.name || !hook.type || !hook.data) {
       return res.status(400).json({ error: 'Each hook must have a name, type, and data.' });
     }
-    // You can add more specific validations based on your requirements
   }
 
   try {
     await pool.query(
       'UPDATE clients SET modules = JSON_SET(modules, "$.hooks", ?) WHERE id = ?',
-      [JSON.stringify(hooks || []), clientId] // JSON.stringify is necessary to convert array to JSON string for MySQL
+      [JSON.stringify(hooks || []), clientId]
     );
     res.json({ success: true });
   } catch (error) {
@@ -651,8 +614,6 @@ app.post('/api/clients/:clientId/hooks', async (req, res) => {
   }
 });
 
-// Load Hooks
-// Load Hooks
 app.get('/api/clients/:clientId/hooks', async (req, res) => {
   const { clientId } = req.params;
 
@@ -664,7 +625,6 @@ app.get('/api/clients/:clientId/hooks', async (req, res) => {
     const modules = JSON.parse(rows[0].modules || '{}');
     let hooks = modules.hooks || [];
 
-    // Ensure hooks is an array
     if (typeof hooks === 'string') {
       try {
         hooks = JSON.parse(hooks);
@@ -674,7 +634,6 @@ app.get('/api/clients/:clientId/hooks', async (req, res) => {
       }
     }
 
-    // Final validation to ensure hooks is an array
     if (!Array.isArray(hooks)) {
       hooks = [];
     }
@@ -694,7 +653,6 @@ app.get('/api/hooks/types', (req, res) => {
   res.json(hookTypes);
 });
 
-// Download aller Logs
 app.get('/api/exportAllLogs', checkAuth, async (req, res) => {
   const allLogsHtml = botManager.exportAllLogs();
   res.setHeader('Content-disposition', 'attachment; filename=all_clients_chatlog.html');
@@ -702,15 +660,12 @@ app.get('/api/exportAllLogs', checkAuth, async (req, res) => {
   res.send(allLogsHtml);
 });
 
-// 3. Statische Dateien servieren
 app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
-// 4. Catch-All für React (nicht für Socket.io)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
 });
 
-// 5. Server starten mit `server.listen`
 server.listen(PORT, () => {
   console.log(`[INFO] Server läuft auf http://localhost:${PORT}`);
 });
