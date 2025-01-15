@@ -211,8 +211,8 @@ Contributions are welcome! Please follow these steps to contribute:
 2. **Clone the Forked Repository**:
 
    ```bash
-   git clone https://github.com/yourusername/minecraft-bot-dashboard.git
-   cd minecraft-bot-dashboard
+   git clone https://github.com/AsylantenAnanas/bot-dashboard.git
+   cd bot-dashboard
    ```
 
 3. **Create a New Branch**:
