@@ -67,8 +67,8 @@ The application follows a client-server architecture:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/minecraft-bot-dashboard.git
-cd minecraft-bot-dashboard
+git clone https://github.com/AsylantenAnanas/bot-dashboard.git
+cd bot-dashboard
 ```
 
 ### Install Backend Dependencies
