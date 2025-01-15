@@ -1,5 +1,3 @@
-// server/actionHandlers.js
-
 const { goals, Movements } = require('mineflayer-pathfinder');
 const { Vec3 } = require('vec3');
 

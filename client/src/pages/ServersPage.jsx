@@ -1,13 +1,14 @@
-// client/src/pages/ServersPage.jsx
-
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '../components/MainLayout';
 import {
   Button, Card, List, Modal, Form, Input, message, InputNumber, Row, Col, Popconfirm
 } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { fetchWithAuth } from '../utils/fetchWithAuth';
 
 const ServersPage = () => {
+  const navigate = useNavigate();
   const [servers, setServers] = useState([]);
   const [createVisible, setCreateVisible] = useState(false);
   const [editVisible, setEditVisible] = useState(false);
@@ -17,7 +18,7 @@ const ServersPage = () => {
 
   const loadServers = async () => {
     try {
-      const res = await fetch('https://bot-dashboard.meinserver.dev/api/servers', { credentials: 'include' });
+      const res = await fetchWithAuth('/servers', {}, navigate);
       if (res.ok) {
         const data = await res.json();
         setServers(data);
@@ -50,7 +51,7 @@ const ServersPage = () => {
 
   const onCreateFinish = async (values) => {
     try {
-      const res = await fetch('https://bot-dashboard.meinserver.dev/api/servers', {
+      const res = await fetchWithAuth('/servers', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -75,12 +76,16 @@ const ServersPage = () => {
   const onEditFinish = async (values) => {
     if (!editingServer) return;
     try {
-      const res = await fetch(`https://bot-dashboard.meinserver.dev/api/servers/${editingServer.id}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
-      });
+      const res = await fetchWithAuth(
+        `/servers/${editingServer.id}`, 
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values)
+        },
+        navigate
+      );
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
@@ -99,10 +104,10 @@ const ServersPage = () => {
 
   const deleteServer = async (serverId) => {
     try {
-      const res = await fetch(`https://bot-dashboard.meinserver.dev/api/servers/${serverId}/delete`, {
+      const res = await fetchWithAuth(`/servers/${serverId}/delete`, {
         method: 'POST',
         credentials: 'include'
-      });
+      }, navigate);
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
@@ -120,7 +125,6 @@ const ServersPage = () => {
 
   return (
     <MainLayout defaultKey="servers">
-      {/* Überschrift mit Button rechts daneben */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ margin: 0 }}>Servers</h1>
         <Button type="primary" onClick={openCreateModal}>
@@ -163,10 +167,9 @@ const ServersPage = () => {
         />
       </div>
 
-      {/* Modal: Server anlegen */}
       <Modal
         title="Server anlegen"
-        visible={createVisible}
+        open={createVisible}
         onCancel={closeCreateModal}
         footer={null}
       >
@@ -206,10 +209,9 @@ const ServersPage = () => {
         </Form>
       </Modal>
 
-      {/* Modal: Server bearbeiten */}
       <Modal
         title="Server bearbeiten"
-        visible={editVisible}
+        open={editVisible}
         onCancel={closeEditModal}
         footer={null}
       >

@@ -31,14 +31,11 @@ class BotHandler {
                 username: this.username,
                 auth: this.auth,
                 version: this.version,
-
-                // Updated: MSA Code Handling via event emit instead of .push()
                 onMsaCode: (data) => {
                     const msaMessage = {
                         timestamp: new Date().toISOString(),
                         text: `Um dich zu authentifizieren, gehe hier: ${data.verification_uri} und gib den Code ${data.user_code} ein.`
                     };
-                    // Emit a custom 'msaCode' event
                     this.bot.emit('msaCode', msaMessage);
                 }
             });
@@ -58,13 +55,11 @@ class BotHandler {
      * Sets up the core Mineflayer events that are essential for the bot's functionality.
      */
     setupEvents() {
-        // Whisper Event
         this.bot.on('whisper', (username, message) => {
             if (username === this.bot.username) return;
             this.handleChat(username, message);
         });
 
-        // Spawn Event
         this.bot.on('spawn', () => {
             if (
                 Number.isFinite(this.serverConfig.npcX) &&
@@ -79,7 +74,6 @@ class BotHandler {
             }
         });
 
-        // Message Event
         this.bot.on('message', (message) => {
             try {
                 const msgText = message.toString();
@@ -101,7 +95,6 @@ class BotHandler {
             }
         });
 
-        // Kicked Event
         this.bot.on('kicked', (reason) => {
             console.warn(`Bot was kicked for reason: ${reason}`);
             if (this.autorestart && !this._stoppedByUser) {
@@ -109,16 +102,12 @@ class BotHandler {
             }
         });
 
-        // Error Event
         this.bot.on('error', (err) => {
             console.error("Bot encountered an error:", err);
             if (this.autorestart && !this._stoppedByUser) {
                 this.rejoinAfterDelay();
             }
         });
-
-        // Additional Core Events (Optional)
-        // Add more core event handlers here if necessary
     }
 
     /**
@@ -136,7 +125,6 @@ class BotHandler {
                 return;
             }
 
-            // Avoid attaching the same event multiple times for performance
             this.bot.on(hook.event, async (data) => {
                 try {
                     await this.executeHook(hook, data, { username: data.username || 'unknown' });
@@ -228,7 +216,6 @@ class BotHandler {
                 case 'endsWith':
                     if (typeof fieldValue === 'string' && !fieldValue.endsWith(compareResolved)) return false;
                     break;
-                // Add more operators as needed
                 default:
                     console.warn(`[BotHandler] Unsupported operator '${operator}' in condition.`);
                     return false;
@@ -262,7 +249,6 @@ class BotHandler {
         setTimeout(() => {
             console.log("[BotHandler] Attempting to rejoin the server...");
             this.bot.emit('rejoinTrigger');
-            // Implement rejoin logic as needed
         }, 2000);
     }
 
@@ -364,7 +350,6 @@ class BotHandler {
      * @param {number} amount - The quantity of the item.
      */
     async initiatePurchase(username, price, itemName, chest, amount) {
-        // Prevent multiple transactions for the same user
         if (this.activeTransactions[username]) {
             this.bot.whisper(username, 'You already have an ongoing transaction. Please wait a moment.');
             return;
@@ -426,7 +411,6 @@ class BotHandler {
 
             this.bot.on('message', messageHandler);
 
-            // Set up timeout to handle cases where no payment is made
             timeoutHandle = setTimeout(async () => {
                 this.bot.removeListener('message', messageHandler);
                 this.bot.whisper(username, 'Payment timeout. Please try the purchase again.');
@@ -447,7 +431,6 @@ class BotHandler {
      */
     async deliverItem(username, chest, itemName, amount, price) {
         try {
-            // Navigate to the chest's plot
             this.bot.chat(`/p h ${chest.plot}`);
 
             const chestLocation = new Vec3(chest.x, chest.y, chest.z);
@@ -466,10 +449,8 @@ class BotHandler {
                 await container.withdraw(itemInChest.type, null, amount);
                 container.close();
 
-                // Short delay to ensure inventory updates
                 await new Promise(resolve => setTimeout(resolve, 500));
 
-                // Check inventory after withdrawal
                 const inventoryItem = this.bot.inventory.findInventoryItem(itemInChest.type, null);
                 const inventoryCount = inventoryItem ? inventoryItem.count : 0;
                 console.log(`[DEBUG] Inventory after withdrawal: ${inventoryCount} ${itemName}`);
@@ -597,7 +578,6 @@ class BotHandler {
                     console.warn(`[WARN] Item ID for '${itemName}' not found. Cannot restore.`);
                 }
             } else {
-                // Optional: Handle restoring multiple items or specific scenarios
                 this.bot.whisper(username, `Items have been returned to the chest.`);
                 console.log(`[DEBUG] Items for ${username} have been returned to the chest.`);
             }

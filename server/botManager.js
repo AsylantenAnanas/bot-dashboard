@@ -1,5 +1,3 @@
-// server/botManager.js
-
 const EventEmitter = require('events');
 const BotHandler = require('./botHandler');
 const { mineflayer: mineflayerViewer } = require('prismarine-viewer');
@@ -7,13 +5,9 @@ const AnsiToHtml = require('ansi-to-html');
 
 const ansiToHtml = new AnsiToHtml();
 
-const fs = require('fs');
-const path = require('path');
-
 class BotManager extends EventEmitter {
   constructor() {
-    super(); // Rufe den Konstruktor von EventEmitter auf
-    // bots = { clientId: { botHandler, status, messages: [], config } }
+    super();
     this.bots = {};
     this.nextViewerPort = 3007;
   }
@@ -21,12 +15,10 @@ class BotManager extends EventEmitter {
   startBot(clientConfig) {
     const { clientId } = clientConfig;
 
-    // Wenn Bot schon läuft
     if (this.bots[clientId] && this.bots[clientId].status === 'running') {
       return;
     }
 
-    // Neue Message im Terminal:
     let messages = [];
     if (!this.bots[clientId]) {
       messages = [];
@@ -45,13 +37,11 @@ class BotManager extends EventEmitter {
     const viewerPort = this.nextViewerPort++;
     mineflayerViewer(botHandler.bot, { port: viewerPort, firstPerson: true });
 
-    // Autorejoin => "rejoinTrigger"
     botHandler.bot.on('rejoinTrigger', () => {
       this.stopBot(clientId);
       this.startBot(clientConfig);
     });
 
-    // Empfängt generelle Chatnachrichten
     botHandler.bot.on('message', (jsonMsg) => {
       if (botHandler.isBlacklisted(jsonMsg.toString())) return;
       const message = {
@@ -62,7 +52,6 @@ class BotManager extends EventEmitter {
       this.emit(`messageUpdate:${clientId}`, message);
     });
 
-    // Listen for the custom 'msaCode' event (MSA auth code messages)
     botHandler.bot.on('msaCode', (msaMessage) => {
       messages.push(msaMessage);
       this.emit(`messageUpdate:${clientId}`, msaMessage);
@@ -104,15 +93,12 @@ class BotManager extends EventEmitter {
       });
     });
 
-    // Gekickt
     botHandler.bot.on('kicked', (reason) => {
       let reasonText = '';
 
       if (typeof reason === 'string') {
-        // If reason is a string, use it directly
         reasonText = reason;
       } else if (typeof reason === 'object' && reason !== null) {
-        // If reason is an object, navigate its structure to extract the text
         if (reason.value && reason.value.text && typeof reason.value.text.value === 'string') {
           reasonText = reason.value.text.value;
         } else if (reason.text && typeof reason.text.value === 'string') {
@@ -133,7 +119,6 @@ class BotManager extends EventEmitter {
       this.bots[clientId].status = 'errored';
     });
 
-    // Error
     botHandler.bot.on('error', (err) => {
       const errorMessage = {
         timestamp: new Date().toISOString(),
@@ -149,7 +134,6 @@ class BotManager extends EventEmitter {
       this.emit(`messageUpdate:${clientId}`, statusMessage);
     });
 
-    // End
     botHandler.bot.on('end', () => {
       const endMessage = {
         timestamp: new Date().toISOString(),
@@ -160,7 +144,6 @@ class BotManager extends EventEmitter {
       this.bots[clientId].status = 'errored';
     });
 
-    // Speichere in this.bots
     this.bots[clientId] = {
       botHandler,
       status: 'running',
@@ -235,7 +218,6 @@ class BotManager extends EventEmitter {
   }
 
   exportAllLogs() {
-    // Start building the HTML content
     let htmlContent = `
       <!DOCTYPE html>
       <html lang="en">
@@ -282,7 +264,6 @@ class BotManager extends EventEmitter {
       htmlContent += `</div>`;
     }
   
-    // Close HTML tags
     htmlContent += `
       </body>
       </html>

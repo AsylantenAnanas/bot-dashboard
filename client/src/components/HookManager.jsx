@@ -1,6 +1,3 @@
-/***********************************************
- * client/src/components/HookManager.jsx
- ***********************************************/
 import React, { useEffect, useState } from 'react';
 import {
   Button, Modal, Form, Select, Input, InputNumber, Space, Table, Popconfirm, message, Collapse,
@@ -16,11 +13,6 @@ const { Option } = Select;
 const { Panel } = Collapse;
 const { confirm } = Modal;
 
-/**
- * ----------------------------------------------------------
- * HookItem: Wiederverwendbare Komponente für Haupt- und Nested Hooks
- * ----------------------------------------------------------
- */
 const HookItem = ({
   field,               // Feld-Index (Form.List)
   form,                // Ant-Design-Form-Instance
@@ -34,21 +26,14 @@ const HookItem = ({
   const [typeFields, setTypeFields] = useState({});                    // Dynamische Felder für Action
   const [selectedEvent, setSelectedEvent] = useState(null);            // Merkt sich das aktuell gewählte Event
 
-  /**
-   * ----------------------------------------------------------
-   * Events
-   * ----------------------------------------------------------
-   */
   const handleEventChange = (value) => {
     const foundEvent = hookEvents.find(e => e.name === value) || null;
     setSelectedEvent(foundEvent);
 
     if (foundEvent) {
-      // Zeige verfügbare Variablen
       const placeholders = (foundEvent.params || []).map(p => `{{${p}}}`);
       setAvailableVariables(placeholders);
 
-      // Eventwechsel => Action zurücksetzen
       form.setFieldsValue({
         [field.name]: {
           ...form.getFieldsValue()[field.name],
@@ -58,7 +43,6 @@ const HookItem = ({
         }
       });
 
-      // Reset typeFields und Conditions
       setTypeFields({});
     } else {
       setAvailableVariables([]);
@@ -67,15 +51,9 @@ const HookItem = ({
     }
   };
 
-  /**
-   * ----------------------------------------------------------
-   * Action Type Handling
-   * ----------------------------------------------------------
-   */
   const handleActionTypeChange = (value) => {
     const foundActionType = actionTypes.find(a => a.name === value);
     if (foundActionType) {
-      // Dynamische Felder (typeFields)
       const dynamicFields = foundActionType.fields.reduce((acc, f) => {
         acc[f.key] = {
           label: f.label,
@@ -93,11 +71,6 @@ const HookItem = ({
     }
   };
 
-  /**
-   * ----------------------------------------------------------
-   * Hook Deletion Confirmation
-   * ----------------------------------------------------------
-   */
   const confirmDeleteHook = () => {
     confirm({
       title: 'Are you sure you want to delete this hook?',
@@ -112,11 +85,6 @@ const HookItem = ({
     });
   };
 
-  /**
-   * ----------------------------------------------------------
-   * RENDER
-   * ----------------------------------------------------------
-   */
   return (
     <Collapse defaultActiveKey={['mainHook']} style={{ marginBottom: 16 }}>
       <Panel
@@ -131,9 +99,6 @@ const HookItem = ({
           <DeleteOutlined style={{ color: 'red' }} onClick={confirmDeleteHook} />
         }
       >
-        {/** -----------------------------------------------
-         *  Event Selection
-         * ----------------------------------------------- */}
         <Form.Item
           name={[field.name, 'name']}
           label={<Space><ScheduleOutlined /><span>Event</span></Space>}
@@ -151,9 +116,6 @@ const HookItem = ({
           </Select>
         </Form.Item>
 
-        {/** -----------------------------------------------
-         *  Info: Available Variables (Placeholders)
-         * ----------------------------------------------- */}
         {availableVariables.length > 0 && (
           <Alert
             style={{ marginBottom: 16 }}
@@ -173,9 +135,6 @@ const HookItem = ({
           />
         )}
 
-        {/** -----------------------------------------------
-         *  Action Type Selection
-         * ----------------------------------------------- */}
         <Form.Item
           name={[field.name, 'type']}
           label={<Space><SettingOutlined /><span>Action Type</span></Space>}
@@ -194,9 +153,6 @@ const HookItem = ({
           </Select>
         </Form.Item>
 
-        {/** -----------------------------------------------
-         *  Type-Specific Fields for Action Type
-         * ----------------------------------------------- */}
         {Object.keys(typeFields).length > 0 && (
           <Card size="small" title="Main Action Parameters" style={{ marginBottom: 16 }}>
             {Object.entries(typeFields).map(([key, cfg]) => (
@@ -212,9 +168,6 @@ const HookItem = ({
           </Card>
         )}
 
-        {/** -----------------------------------------------
-         *  Actions
-         * ----------------------------------------------- */}
         <Divider orientation="left">Actions</Divider>
         <Form.List name={[field.name, 'data', 'actions']}>
           {(actionFields, { add: addAction, remove: removeAction }) => (
@@ -240,7 +193,6 @@ const HookItem = ({
                       </Popconfirm>
                     }
                   >
-                    {/** Action Type */}
                     <Form.Item
                       name={[actionField.name, 'type']}
                       label={<Space><SettingOutlined /><span>Action Type</span></Space>}
@@ -258,7 +210,6 @@ const HookItem = ({
                       </Select>
                     </Form.Item>
 
-                    {/** Action Conditions */}
                     <Form.List name={[actionField.name, 'conditions']}>
                       {(condFields, { add: addCond, remove: removeCond }) => (
                         <>
@@ -280,12 +231,6 @@ const HookItem = ({
                                 </Popconfirm>
                               }
                             >
-                              {/**
-                               * Condition Logic (e.g., If)
-                               * Field: Variable ({{username}}, etc.)
-                               * Operator: equals, not_equals, contains, etc.
-                               * Compare Value: Input or Variable
-                               */}
                               <Form.Item
                                 name={[condField.name, 'field']}
                                 label="Field"
@@ -308,7 +253,6 @@ const HookItem = ({
                                   <Option value="contains">contains</Option>
                                   <Option value="startsWith">starts with</Option>
                                   <Option value="endsWith">ends with</Option>
-                                  {/* Weitere Operatoren können hier hinzugefügt werden */}
                                 </Select>
                               </Form.Item>
                               <Form.Item
@@ -332,7 +276,6 @@ const HookItem = ({
                       )}
                     </Form.List>
 
-                    {/** Action Parameters */}
                     <Form.Item shouldUpdate>
                       {({ getFieldValue }) => {
                         const currentActionType = getFieldValue([
@@ -385,9 +328,6 @@ const HookItem = ({
           )}
         </Form.List>
 
-        {/** -----------------------------------------------
-         *  Nested Hooks
-         * ----------------------------------------------- */}
         <Divider orientation="left">Nested Hooks</Divider>
         <Form.List name={[field.name, 'data', 'nestedHooks']}>
           {(nestedFields, { add: addNested, remove: removeNested }) => (
@@ -419,11 +359,6 @@ const HookItem = ({
   );
 };
 
-/**
- * ----------------------------------------------------------
- * HookManager: Haupt-Komponente
- * ----------------------------------------------------------
- */
 const HookManager = ({ clientId }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [hooks, setHooks] = useState([]);
@@ -432,14 +367,9 @@ const HookManager = ({ clientId }) => {
   const [hookEvents, setHookEvents] = useState([]);
   const [actionTypes, setActionTypes] = useState([]);
 
-  /**
-   * ----------------------------------------------------------
-   * Backend Calls: Events, ActionTypes, Hooks
-   * ----------------------------------------------------------
-   */
   const loadHookEvents = async () => {
     try {
-      const res = await fetchWithAuth('/api/hooks/events', {}, null);
+      const res = await fetchWithAuth('/hooks/events', {}, null);
       if (!res.ok) {
         throw new Error('Failed to fetch hook events');
       }
@@ -453,7 +383,7 @@ const HookManager = ({ clientId }) => {
 
   const loadActionTypes = async () => {
     try {
-      const res = await fetchWithAuth('/api/hooks/types', {}, null);
+      const res = await fetchWithAuth('/hooks/types', {}, null);
       if (!res.ok) {
         throw new Error('Failed to fetch action types');
       }
@@ -467,7 +397,7 @@ const HookManager = ({ clientId }) => {
 
   const loadHooks = async () => {
     try {
-      const res = await fetchWithAuth(`/api/clients/${clientId}/hooks`, {}, null);
+      const res = await fetchWithAuth(`/clients/${clientId}/hooks`, {}, null);
       if (!res.ok) {
         throw new Error('Failed to fetch hooks');
       }
@@ -490,11 +420,6 @@ const HookManager = ({ clientId }) => {
     }
   };
 
-  /**
-   * ----------------------------------------------------------
-   * Lifecycle
-   * ----------------------------------------------------------
-   */
   useEffect(() => {
     loadHookEvents();
     loadActionTypes();
@@ -502,11 +427,7 @@ const HookManager = ({ clientId }) => {
     // eslint-disable-next-line
   }, [clientId]);
 
-  /**
-   * ----------------------------------------------------------
-   * Modal Handling
-   * ----------------------------------------------------------
-   */
+
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -517,34 +438,25 @@ const HookManager = ({ clientId }) => {
     form.resetFields();
   };
 
-  /**
-   * ----------------------------------------------------------
-   * Save / Update Hooks
-   * ----------------------------------------------------------
-   */
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      // values.hooks => Liste aller Hooks
       let updatedHooks = [...hooks];
 
       if (editingHook) {
-        // Hooks updaten
         const idx = updatedHooks.findIndex(h => h.id === editingHook.id);
         if (idx !== -1) {
           updatedHooks[idx] = { ...editingHook, ...values.hooks[0] };
         }
       } else {
-        // Neuer Hook
         const newHook = {
-          id: Date.now(),  // Temporärer Unique Key
+          id: Date.now(),
           ...values.hooks[0]
         };
         updatedHooks.push(newHook);
       }
 
-      // Speichern im Backend
-      const res = await fetchWithAuth(`/api/clients/${clientId}/hooks`, {
+      const res = await fetchWithAuth(`/clients/${clientId}/hooks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hooks: updatedHooks })
@@ -565,15 +477,10 @@ const HookManager = ({ clientId }) => {
     }
   };
 
-  /**
-   * ----------------------------------------------------------
-   * Delete Hook
-   * ----------------------------------------------------------
-   */
   const handleDelete = async (hookId) => {
     try {
       const updatedHooks = hooks.filter(h => h.id !== hookId);
-      const res = await fetchWithAuth(`/api/clients/${clientId}/hooks`, {
+      const res = await fetchWithAuth(`/clients/${clientId}/hooks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hooks: updatedHooks })
@@ -592,11 +499,6 @@ const HookManager = ({ clientId }) => {
     }
   };
 
-  /**
-   * ----------------------------------------------------------
-   * Table Columns
-   * ----------------------------------------------------------
-   */
   const columns = [
     {
       title: 'Event',
@@ -663,7 +565,7 @@ const HookManager = ({ clientId }) => {
 
       <Modal
         title={editingHook ? 'Edit Hook' : 'Add New Hook'}
-        visible={isModalVisible}
+        open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
         width={1200}
@@ -681,7 +583,7 @@ const HookManager = ({ clientId }) => {
           form={form}
           layout="vertical"
           initialValues={{
-            hooks: [] // Start with einer leeren Hooks-Liste
+            hooks: [{}]
           }}
         >
           <Form.List name="hooks">

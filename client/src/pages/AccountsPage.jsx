@@ -19,11 +19,11 @@ const AccountsPage = () => {
 
   // Function to load accounts from the server
   const loadAccounts = async () => {
-    const res = await fetchWithAuth('https://bot-dashboard.meinserver.dev/api/accounts', {}, navigate);
+    const res = await fetchWithAuth('/accounts', {}, navigate); // Relative URL
     if (!res.ok) return;
     const data = await res.json();
     setAccounts(data);
-  };
+  };  
 
   useEffect(() => {
     loadAccounts();
@@ -54,7 +54,7 @@ const AccountsPage = () => {
 
   // Handler for adding a new account
   const onAddFinish = async (values) => {
-    const res = await fetchWithAuth('https://bot-dashboard.meinserver.dev/api/accounts', {
+    const res = await fetchWithAuth('/accounts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(values),
@@ -77,7 +77,7 @@ const AccountsPage = () => {
       return;
     }
 
-    const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/accounts/${currentAccount.id}`, {
+    const res = await fetchWithAuth(`/accounts/${currentAccount.id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(values),
@@ -95,7 +95,7 @@ const AccountsPage = () => {
 
   // Handler for deleting an account
   const handleDelete = async (accountId) => {
-    const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/accounts/${accountId}/delete`, {
+    const res = await fetchWithAuth(`/accounts/${accountId}/delete`, {
       method: 'POST',
     }, navigate);
     if (!res.ok) return;

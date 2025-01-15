@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '../components/MainLayout';
 import { Row, Col, Card, message, Button } from 'antd';
+import { fetchWithAuth } from '../utils/fetchWithAuth';
 
 function DashboardPage() {
+  const navigate = useNavigate();
   const [accountsCount, setAccountsCount] = useState(0);
   const [clientsCount, setClientsCount] = useState(0);
   const [runningCount, setRunningCount] = useState(0);
@@ -13,8 +16,8 @@ function DashboardPage() {
     const fetchData = async () => {
       try {
         const [accRes, cliRes] = await Promise.all([
-          fetch('https://bot-dashboard.meinserver.dev/api/accounts', { credentials: 'include' }),
-          fetch('https://bot-dashboard.meinserver.dev/api/clients', { credentials: 'include' })
+          fetchWithAuth('/accounts', {}, navigate),
+          fetchWithAuth('/clients', {}, navigate)
         ]);
         if (accRes.ok && cliRes.ok) {
           const accounts = await accRes.json();
@@ -43,7 +46,7 @@ function DashboardPage() {
   }, []);
 
   const downloadAllLogs = () => {
-    window.open('https://bot-dashboard.meinserver.dev/api/exportAllLogs', '_blank');
+    window.open('/exportAllLogs', '_blank');
   };
 
   return (

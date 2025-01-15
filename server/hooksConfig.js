@@ -448,8 +448,6 @@ module.exports = {
                 { key: 'duration', type: 'number', label: 'Duration (seconds)' }
             ]
         },
-        // New Action Types Below
-    
         {
             name: 'dig',
             label: 'Dig',
@@ -493,16 +491,6 @@ module.exports = {
             fields: [
                 { key: 'item', type: 'string', label: 'Item Name' },
                 { key: 'target', type: 'string', label: 'Target Block or Entity' }
-            ]
-        },
-        {
-            name: 'setWaypoint',
-            label: 'Set Waypoint',
-            fields: [
-                { key: 'name', type: 'string', label: 'Waypoint Name' },
-                { key: 'x', type: 'number', label: 'X Coordinate' },
-                { key: 'y', type: 'number', label: 'Y Coordinate' },
-                { key: 'z', type: 'number', label: 'Z Coordinate' }
             ]
         },
         {

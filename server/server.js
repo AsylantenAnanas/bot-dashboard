@@ -1,4 +1,3 @@
-// server/server.js
 const express = require('express');
 const session = require('express-session');
 const { Server } = require('socket.io');
@@ -82,14 +81,14 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
   name: 'sessionId', // Custom cookie name
-  secret: 'mein-super-geheimnis',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 24 * 60 * 60 * 1000, // Default cookie expiration: 1 day
-    httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-    secure: false, // Set to true if using HTTPS
-    sameSite: 'lax', // CSRF protection
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
   },
 }));
 
@@ -101,7 +100,6 @@ app.get('/viewers/:clientId', checkAuth, (req, res) => {
     return res.status(404).send('Viewer not found');
   }
 
-  // Redirect only if the path doesn't end with a slash
   if (!req.path.endsWith('/')) {
     return res.redirect(`/viewers/${clientId}/`);
   }
@@ -113,7 +111,7 @@ app.get('/viewers/:clientId', checkAuth, (req, res) => {
     changeOrigin: true,
     logLevel: 'debug',
     pathRewrite: {
-      [`^/viewers/${clientId}/`]: '/', // Remove the /viewers/:clientId/ prefix
+      [`^/viewers/${clientId}/`]: '/',
     },
     onProxyReq: (proxyReq, req, res) => {
       console.log(`[PROXY] Proxying request to: ${target}/`);
@@ -137,14 +135,11 @@ app.get('/viewers/:clientId', checkAuth, (req, res) => {
 app.get('/viewers/:clientId/:fileName', checkAuth, (req, res, next) => {
   const { clientId, fileName } = req.params;
 
-  // Ensure the fileName ends with .js
   if (!fileName.endsWith('.js')) {
     return res.status(400).send('Invalid file extension');
   }
 
-  // Remove the .js extension for processing
   const actualFileName = fileName.slice(0, -3);
-
   const botData = botManager.bots[clientId];
 
   if (!botData || !botData.viewerPort) {
@@ -181,7 +176,7 @@ app.get('/viewers/:clientId/:fileName', checkAuth, (req, res, next) => {
 // Auth-Check Middleware
 function checkAuth(req, res, next) {
   if (req.session && req.session.loggedIn && req.session.userId) {
-    req.userId = req.session.userId; // Make userId easily accessible
+    req.userId = req.session.userId;
     next();
   } else {
     res.status(401).json({ error: 'Nicht eingeloggt' });
@@ -203,7 +198,7 @@ app.post('/api/login', async (req, res) => {
     }
     const user = rows[0];
     req.session.loggedIn = true;
-    req.session.userId = user.id; // Store user ID in session
+    req.session.userId = user.id;
     req.session.username = user.username;
     return res.json({ success: true });
   } catch (err) {
@@ -218,7 +213,7 @@ app.post('/api/logout', (req, res) => {
       console.error(err);
       return res.status(500).json({ error: 'Fehler beim Logout' });
     }
-    res.clearCookie('sessionId'); // Clear the cookie
+    res.clearCookie('sessionId');
     res.json({ success: true });
   });
 });
@@ -278,7 +273,6 @@ app.post('/api/accounts/:id', checkAuth, async (req, res) => {
 app.post('/api/accounts/:id/delete', checkAuth, async (req, res) => {
   const { id } = req.params;
   try {
-    // Verify ownership
     const [existing] = await pool.query('SELECT * FROM accounts WHERE id = ? AND user_id = ?', [id, req.userId]);
     if (existing.length === 0) {
       return res.status(403).json({ error: 'Zugriff verweigert' });

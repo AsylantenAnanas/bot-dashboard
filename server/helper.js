@@ -2,7 +2,6 @@ const ansiToHtml = require('ansi-to-html');
 const ansiConverter = new ansiToHtml();
 
 function generateClientLogHtml(clientId, status, messages) {
-    // Start building the HTML content
     let htmlContent = `
       <!DOCTYPE html>
       <html lang="en">
@@ -42,7 +41,6 @@ function generateClientLogHtml(clientId, status, messages) {
         <div class="client-header">Status: ${status}</div>
     `;
 
-    // Add each message
     messages.forEach(msg => {
         const timestamp = new Date(msg.timestamp).toLocaleString();
         const messageHtml = ansiConverter.toHtml(msg.text);
@@ -53,7 +51,6 @@ function generateClientLogHtml(clientId, status, messages) {
       `;
     });
 
-    // Close HTML tags
     htmlContent += `
       </body>
       </html>

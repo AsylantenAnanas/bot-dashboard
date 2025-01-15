@@ -1,6 +1,3 @@
-/***********************************************
- * client/src/pages/ClientDetailsPage.jsx
- ***********************************************/
 import React, { useEffect, useState, useRef } from 'react';
 import AnsiToHtml from 'ansi-to-html';
 import socket from '../socket';
@@ -321,7 +318,7 @@ const ClientDetailsPage = () => {
   }, [messages, isInitialLoad]);
 
   const loadClient = async () => {
-    const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}`, {}, navigate);
+    const res = await fetchWithAuth(`/clients/${clientId}`, {}, navigate);
     if (!res.ok) return;
     const data = await res.json();
     setClient(data);
@@ -343,7 +340,7 @@ const ClientDetailsPage = () => {
   };
 
   const loadMessages = async () => {
-    const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}/messages`, {}, navigate);
+    const res = await fetchWithAuth(`/clients/${clientId}/messages`, {}, navigate);
     if (!res.ok) return;
     const data = await res.json();
     setMessages(data);
@@ -351,7 +348,7 @@ const ClientDetailsPage = () => {
   };
 
   const loadGalleryImages = async () => {
-    const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/bots/${clientId}/images`, {}, navigate);
+    const res = await fetchWithAuth(`/bots/${clientId}/images`, {}, navigate);
     if (!res.ok) {
       console.error('Error loading images');
       return;
@@ -362,7 +359,7 @@ const ClientDetailsPage = () => {
 
   // Start/Stop/Rejoin Functions
   const startBot = async () => {
-    const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}/start`, { method: 'POST' }, navigate);
+    const res = await fetchWithAuth(`/clients/${clientId}/start`, { method: 'POST' }, navigate);
     if (res.ok) {
       message.success('Bot started');
       loadClient();
@@ -371,7 +368,7 @@ const ClientDetailsPage = () => {
   };
 
   const stopBot = async () => {
-    const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}/stop`, { method: 'POST' }, navigate);
+    const res = await fetchWithAuth(`/clients/${clientId}/stop`, { method: 'POST' }, navigate);
     if (res.ok) {
       message.info('Bot stopped');
       loadClient();
@@ -380,7 +377,7 @@ const ClientDetailsPage = () => {
   };
 
   const rejoinBot = async () => {
-    const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}/rejoin`, { method: 'POST' }, navigate);
+    const res = await fetchWithAuth(`/clients/${clientId}/rejoin`, { method: 'POST' }, navigate);
     if (res.ok) {
       message.info('Bot rejoined');
       loadClient();
@@ -392,7 +389,7 @@ const ClientDetailsPage = () => {
   const sendChat = async () => {
     const msg = inputValue.trim();
     if (!msg) return;
-    const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}/chat`, {
+    const res = await fetchWithAuth(`/clients/${clientId}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: msg })
@@ -410,7 +407,7 @@ const ClientDetailsPage = () => {
 
   // Delete and Export Client
   const handleDelete = async () => {
-    const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}/delete`, {
+    const res = await fetchWithAuth(`/clients/${clientId}/delete`, {
       method: 'POST'
     }, navigate);
     if (res.ok) {
@@ -423,7 +420,7 @@ const ClientDetailsPage = () => {
   };
 
   const handleExport = () => {
-    window.open(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}/export`, '_blank');
+    window.open(`/clients/${clientId}/export`, '_blank');
   };
 
   // Auto-Save Settings with Debounce
@@ -471,7 +468,7 @@ const ClientDetailsPage = () => {
       }
     };
     try {
-      const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}`, {
+      const res = await fetchWithAuth(`/clients/${clientId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -513,7 +510,7 @@ const ClientDetailsPage = () => {
   const captureBotImage = async () => {
     setIsCapturing(true);
     try {
-      const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/bots/${clientId}/view`, {
+      const res = await fetchWithAuth(`/bots/${clientId}/view`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       }, navigate);
@@ -542,7 +539,7 @@ const ClientDetailsPage = () => {
   const fetchPlayers = async () => {
     setPlayersLoading(true);
     try {
-      const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}/players`, {}, navigate);
+      const res = await fetchWithAuth(`/clients/${clientId}/players`, {}, navigate);
       if (!res.ok) {
         throw new Error('Failed to fetch players');
       }

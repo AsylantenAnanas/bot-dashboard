@@ -41,7 +41,7 @@ const ClientsPage = () => {
 
   const loadClients = async () => {
     try {
-      const res = await fetchWithAuth('https://bot-dashboard.meinserver.dev/api/clients', {}, navigate);
+      const res = await fetchWithAuth('/clients', {}, navigate);
       if (!res.ok) {
         throw new Error('Fehler beim Laden der Clients');
       }
@@ -54,7 +54,7 @@ const ClientsPage = () => {
 
   const loadAccounts = async () => {
     try {
-      const res = await fetchWithAuth('https://bot-dashboard.meinserver.dev/api/accounts', {}, navigate);
+      const res = await fetchWithAuth('/accounts', {}, navigate);
       if (!res.ok) {
         throw new Error('Fehler beim Laden der Accounts');
       }
@@ -67,7 +67,7 @@ const ClientsPage = () => {
 
   const loadServers = async () => {
     try {
-      const res = await fetchWithAuth('https://bot-dashboard.meinserver.dev/api/servers', {}, navigate);
+      const res = await fetchWithAuth('/servers', {}, navigate);
       if (!res.ok) {
         throw new Error('Fehler beim Laden der Server');
       }
@@ -85,7 +85,7 @@ const ClientsPage = () => {
 
   const onCreateFinish = async (values) => {
     try {
-      const res = await fetchWithAuth('https://bot-dashboard.meinserver.dev/api/clients', {
+      const res = await fetchWithAuth('/clients', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values)
@@ -110,7 +110,7 @@ const ClientsPage = () => {
   const startClients = async (clientIds) => {
     try {
       const promises = clientIds.map(id =>
-        fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${id}/start`, { method: 'POST' }, navigate)
+        fetchWithAuth(`/clients/${id}/start`, { method: 'POST' }, navigate)
       );
       const responses = await Promise.all(promises);
       const success = responses.filter(res => res.ok).length;
@@ -125,7 +125,7 @@ const ClientsPage = () => {
   const stopClients = async (clientIds) => {
     try {
       const promises = clientIds.map(id =>
-        fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${id}/stop`, { method: 'POST' }, navigate)
+        fetchWithAuth(`/clients/${id}/stop`, { method: 'POST' }, navigate)
       );
       const responses = await Promise.all(promises);
       const success = responses.filter(res => res.ok).length;
@@ -140,7 +140,7 @@ const ClientsPage = () => {
   const rejoinClients = async (clientIds) => {
     try {
       const promises = clientIds.map(id =>
-        fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${id}/rejoin`, { method: 'POST' }, navigate)
+        fetchWithAuth(`/clients/${id}/rejoin`, { method: 'POST' }, navigate)
       );
       const responses = await Promise.all(promises);
       const success = responses.filter(res => res.ok).length;
@@ -237,7 +237,7 @@ const ClientsPage = () => {
   // Individuelle Aktionsfunktionen
   const startClient = async (clientId) => {
     try {
-      const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}/start`, { method: 'POST' }, navigate);
+      const res = await fetchWithAuth(`/clients/${clientId}/start`, { method: 'POST' }, navigate);
       if (!res.ok) {
         throw new Error('Fehler beim Starten des Bots');
       }
@@ -250,7 +250,7 @@ const ClientsPage = () => {
 
   const stopClient = async (clientId) => {
     try {
-      const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}/stop`, { method: 'POST' }, navigate);
+      const res = await fetchWithAuth(`/clients/${clientId}/stop`, { method: 'POST' }, navigate);
       if (!res.ok) {
         throw new Error('Fehler beim Stoppen des Bots');
       }
@@ -263,7 +263,7 @@ const ClientsPage = () => {
 
   const rejoinClient = async (clientId) => {
     try {
-      const res = await fetchWithAuth(`https://bot-dashboard.meinserver.dev/api/clients/${clientId}/rejoin`, { method: 'POST' }, navigate);
+      const res = await fetchWithAuth(`/clients/${clientId}/rejoin`, { method: 'POST' }, navigate);
       if (!res.ok) {
         throw new Error('Fehler beim Neustarten des Bots');
       }

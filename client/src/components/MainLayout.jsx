@@ -1,9 +1,7 @@
-/***********************************************
- * client/src/components/MainLayout.jsx
- ***********************************************/
 import React from 'react'
 import { Layout, Menu, Button } from 'antd'
 import { useNavigate } from 'react-router-dom'
+import { fetchWithAuth } from '../utils/fetchWithAuth'
 
 const { Header, Content } = Layout
 
@@ -11,14 +9,13 @@ const MainLayout = ({ children, defaultKey = 'dashboard' }) => {
   const navigate = useNavigate()
 
   const logout = async () => {
-    await fetch('https://bot-dashboard.meinserver.dev/api/logout', {
+    await fetchWithAuth('/logout', {
       method: 'POST',
       credentials: 'include'
     })
     navigate('/login')
   }
 
-  // Navbar-Items
   const items = [
     { key: 'dashboard', label: 'Dashboard', onClick: () => navigate('/dashboard') },
     { key: 'accounts', label: 'Accounts', onClick: () => navigate('/accounts') },
@@ -29,12 +26,10 @@ const MainLayout = ({ children, defaultKey = 'dashboard' }) => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header className="main-header">
-        {/* Titel */}
         <div className="title">
           Bot Dashboard
         </div>
 
-        {/* Menü-Wrapper */}
         <div className="menu-wrapper">
           <Menu
             mode="horizontal"
@@ -44,7 +39,6 @@ const MainLayout = ({ children, defaultKey = 'dashboard' }) => {
           />
         </div>
 
-        {/* Logout-Button */}
         <Button className="logout-button" onClick={logout}>
           Logout
         </Button>

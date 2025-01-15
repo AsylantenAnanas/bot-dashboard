@@ -1,13 +1,16 @@
-// client/src/utils/fetchWithAuth.js
 import { message } from 'antd';
 
 /**
  * fetchWithAuth
  *  - credentials: 'include'
  *  - Falls HTTP 401, -> redirect to /login
- *  - wir geben das fetch-Response-Objekt zurück
+ *  - Returns the fetch Response object
  */
 export async function fetchWithAuth(url, options = {}, navigate) {
+  const baseUrl = process.env.REACT_APP_API_BASE_URL || '';
+  const isAbsolute = /^https?:\/\//i.test(url);
+  const fullUrl = isAbsolute ? url : `${baseUrl}${url}`;
+
   const defaultOptions = {
     credentials: 'include'
   };
@@ -15,14 +18,14 @@ export async function fetchWithAuth(url, options = {}, navigate) {
 
   let response;
   try {
-    response = await fetch(url, merged);
+    response = await fetch(fullUrl, merged);
   } catch (err) {
     message.error('Netzwerkfehler oder Server nicht erreichbar.');
     throw err;
   }
 
   if (response.status === 401) {
-    // Session ungültig -> leiten wir direkt um
+    // Session invalid -> redirect
     navigate('/login', { replace: true });
     return response; 
   }

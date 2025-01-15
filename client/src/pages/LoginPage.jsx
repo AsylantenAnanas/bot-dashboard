@@ -1,7 +1,7 @@
-// client/src/pages/LoginPage.jsx
 import React, { useState } from 'react';
 import { Card, Form, Input, Button, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { fetchWithAuth } from '../utils/fetchWithAuth';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -10,12 +10,16 @@ const LoginPage = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const res = await fetch('https://bot-dashboard.meinserver.dev/api/login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
-      });
+      const res = await fetchWithAuth(
+        '/login', 
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values)
+        },
+        navigate
+      );
       if (res.status === 401) {
         message.error('Falsche Login-Daten');
       } else if (res.ok) {
