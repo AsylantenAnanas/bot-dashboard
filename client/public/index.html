@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bot Manager</title>
+
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon/android-chrome-512x512.png">
+    <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/favicon/favicon.ico">
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      @media (max-width: 768px) {
+        .remove-on-mobile {
+          display: none;
+          /* Dashboard-Titel entfernen */
+        }
+
+        .logout-button {
+          margin-left: auto;
+          /* Button auf die rechte Seite schieben */
+        }
+      }
+
+      /* MainLayout.css */
+
+      .main-header {
+        background: #fff;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+      }
+
+      .title {
+        margin-right: 32px;
+        font-weight: bold;
+        font-size: 18px;
+        white-space: nowrap;
+      }
+
+      .menu-wrapper {
+        flex-grow: 1;
+        overflow: hidden;
+        /* Prevent overflow on large screens */
+      }
+
+      .main-menu {
+        border-bottom: none;
+        /* Ensure the menu takes full width */
+        width: 100%;
+      }
+
+      .logout-button {
+        margin-left: 16px;
+        white-space: nowrap;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        .menu-wrapper {
+          overflow-x: auto;
+          /* Enable horizontal scrolling */
+        }
+
+        .main-menu {
+          /* Prevent the Menu from wrapping items */
+          white-space: nowrap;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+
+</html>
