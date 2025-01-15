@@ -194,9 +194,10 @@ The frontend is built with React and utilizes React Router for client-side routi
   - `ClientsPage.js`
   - `ClientDetailsPage.js`
 
-### Styling
+## TODO
 
-The application uses CSS for styling. You can find the styles in the respective component files within the `client/src` directory. Feel free to customize the styles to match your preferences.
+- Finish the server side code for the hooks
+- ...
 
 ## Contributing
 
@@ -249,7 +250,3 @@ For any inquiries or support, please contact:
 
 - **Discord**: web.wizard
 - **GitHub**: [AsylantenAnanas](https://github.com/AsylantenAnanas)
-
----
-
-Feel free to customize this README further to better fit your project's specifics, such as adding screenshots, detailed setup instructions, or any other relevant information.
