@@ -420,7 +420,7 @@ const ClientDetailsPage = () => {
   };
 
   const handleExport = () => {
-    window.open(`/clients/${clientId}/export`, '_blank');
+    window.open(`/api/clients/${clientId}/export`, '_blank');
   };
 
   // Auto-Save Settings with Debounce
