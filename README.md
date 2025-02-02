@@ -13,8 +13,6 @@
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
 - [Running the Application](#running-the-application)
-- [API Endpoints](#api-endpoints)
-- [Frontend](#frontend)
 - [TODO](#todo)
 - [Contributing](#contributing)
 - [License](#license)
@@ -42,11 +40,10 @@
 - **Backend**: Express.js, Node.js
 - **Database**: MySQL
 - **Real-time Communication**: Socket.io
-- **Other Libraries**:
-  - `express-session` for session management
-  - `cors` for Cross-Origin Resource Sharing
-  - `http-proxy-middleware` for proxying requests
-  - `dotenv` for environment variable management
+- **Minecraft Libraries**:
+  - `mineflayer` for bot management and interaction
+  - `mineflayer-pathfinder` for pathfinding and navigation
+  - `prismarine-viewer` for Minecraft viewer integration
 
 ## Architecture
 
@@ -75,14 +72,13 @@ cd bot-dashboard
 ### Install Backend Dependencies
 
 ```bash
-cd server
 npm install
 ```
 
 ### Install Frontend Dependencies
 
 ```bash
-cd ../client
+cd ./src/client
 npm install
 ```
 
@@ -97,7 +93,7 @@ Rename the `.env.example` file in the `client` and `server` directory.
 ### Start the Backend Server
 
 ```bash
-cd server
+cd ../../
 npm start
 ```
 
@@ -108,7 +104,7 @@ The server will run on `http://localhost:4000`.
 In a new terminal window:
 
 ```bash
-cd client
+cd ./src/client
 npm start
 ```
 
@@ -119,88 +115,18 @@ The React app will run on `http://localhost:3000`.
 To build the React app for production:
 
 ```bash
-cd client
+cd ./src/client
 npm run build
 ```
 
 The built files will be served by the Express server.
 
-## API Endpoints
-
-### Authentication
-
-- **POST** `/api/login`: Authenticate user with username and password.
-- **POST** `/api/logout`: Logout the current user.
-
-### Accounts
-
-- **GET** `/api/accounts`: Retrieve all accounts for the logged-in user.
-- **POST** `/api/accounts`: Create a new account.
-- **POST** `/api/accounts/:id`: Update an existing account.
-- **POST** `/api/accounts/:id/delete`: Delete an account.
-
-### Servers
-
-- **GET** `/api/servers`: Retrieve all server configurations.
-- **POST** `/api/servers`: Create a new server configuration.
-- **POST** `/api/servers/:id`: Update a server configuration.
-- **POST** `/api/servers/:id/delete`: Delete a server configuration.
-
-### Clients (Bots)
-
-- **GET** `/api/clients`: Retrieve all clients (bots) for the logged-in user.
-- **POST** `/api/clients`: Create a new client (bot).
-- **POST** `/api/clients/:clientId`: Update a client.
-- **GET** `/api/clients/:clientId`: Retrieve details of a specific client.
-- **POST** `/api/clients/:clientId/delete`: Delete a client.
-- **POST** `/api/clients/:clientId/start`: Start a bot.
-- **POST** `/api/clients/:clientId/stop`: Stop a bot.
-- **POST** `/api/clients/:clientId/rejoin`: Rejoin a bot.
-- **POST** `/api/clients/:clientId/chat`: Send a chat message to a bot.
-- **GET** `/api/clients/:clientId/messages`: Retrieve chat messages from a bot.
-- **GET** `/api/clients/:clientId/export`: Export chat logs.
-- **GET** `/api/clients/:clientId/players`: Retrieve the list of players on the server.
-- **GET** `/api/clients/:clientId/playerAmount`: Retrieve the number of players on the server.
-- **POST** `/api/clients/:clientId/hooks`: Set hooks for a client.
-- **GET** `/api/clients/:clientId/hooks`: Get hooks for a client.
-
-### Hooks
-
-- **GET** `/api/hooks/events`: Retrieve available hook events.
-- **GET** `/api/hooks/types`: Retrieve available hook types.
-
-### Export Logs
-
-- **GET** `/api/exportAllLogs`: Download logs for all clients.
-
-## Frontend
-
-The frontend is built with React and utilizes React Router for client-side routing. The main entry point is `client/src/App.js`, which defines the routes for the application:
-
-- `/` and `/login`: **Login Page**
-- `/dashboard`: **Dashboard Page**
-- `/accounts`: **Accounts Management Page**
-- `/servers`: **Servers Management Page**
-- `/clients`: **Clients (Bots) Management Page**
-- `/clients/:clientId`: **Client Details Page**
-
-### Main Frontend Files
-
-- **App.js**: Defines the main routes of the application.
-- **Pages**: Located in `client/src/pages/`, each page corresponds to a specific route.
-  - `LoginPage.js`
-  - `DashboardPage.js`
-  - `AccountsPage.js`
-  - `ServersPage.js`
-  - `ClientsPage.js`
-  - `ClientDetailsPage.js`
-
 ## TODO
 
-- Finish the server side code for the hooks
-- Fix prismarine viewer proxy
-- Add some structure to the server files
-- Add Bedrock support
+- In progress: Finish the server side code for the hooks
+- Trying: Fix prismarine viewer proxy
+- In progress: Add Bedrock support
+- In progress: Add proxy to the clients
 - ...
 
 ## Contributing
@@ -252,5 +178,5 @@ This project is licensed under the [MIT License](LICENSE). You are free to use, 
 
 For any inquiries or support, please contact:
 
-- **Discord**: web.wizard
+- **Discord**: [web.wizard](https://discord.com/users/913878824951873536)
 - **GitHub**: [AsylantenAnanas](https://github.com/AsylantenAnanas)
