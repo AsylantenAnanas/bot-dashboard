@@ -7,7 +7,7 @@ import { message } from 'antd';
  *  - Returns the fetch Response object
  */
 export async function fetchWithAuth(url, options = {}, navigate) {
-  const baseUrl = process.env.REACT_APP_API_BASE_URL || '';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
   const isAbsolute = /^https?:\/\//i.test(url);
   const fullUrl = isAbsolute ? url : `${baseUrl}${url}`;
 

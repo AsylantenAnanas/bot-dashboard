@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Minecraft Bot Viewer</title>
+        <style>
+            /* Einfaches Layout: Viewer links, Scoreboard rechts */
+            body {
+                margin: 0;
+                display: flex;
+                height: 100vh;
+                font-family: sans-serif;
+                background: #222;
+            }
+
+            #viewer {
+                flex: 1;
+                background: #000;
+            }
+
+            #scoreboard {
+                width: 300px;
+                background: rgba(0, 0, 0, 0.8);
+                color: #fff;
+                padding: 10px;
+                overflow-y: auto;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="viewer"></div>
+        <div id="scoreboard">
+            <h2>Scoreboard</h2>
+            <!-- Scoreboard-Inhalt wird dynamisch geladen -->
+            <div id="scoreboard-content"></div>
+        </div>
+
+        <!-- Prismarine Viewer von einem CDN laden (alternativ lokal bereitstellen) -->
+        <script src="https://unpkg.com/prismarine-viewer@1.28.0/build/PrismarineViewer.js"></script>
+        <script>
+            // Initialisiere den Viewer im Div "viewer"
+            const viewerDiv = document.getElementById('viewer');
+            const viewer = new PrismarineViewer(viewerDiv, {
+                firstPerson: true,
+                // weitere Konfigurationen, falls nötig
+            });
+
+            // Beispiel-Funktion zum Aktualisieren des Scoreboards
+            function updateScoreboard(data) {
+                const scoreboardContent = document.getElementById('scoreboard-content');
+                // Leeren Inhalt
+                scoreboardContent.innerHTML = '';
+                data.forEach(player => {
+                    const el = document.createElement('div');
+                    el.textContent = player.name + ': ' + player.score;
+                    scoreboardContent.appendChild(el);
+                });
+            }
+
+            // Beispiel: Scoreboard-Daten alle 5 Sekunden aktualisieren (anpassen!)
+            setInterval(() => {
+                fetch('/api/scoreboardData')
+                    .then(res => res.json())
+                    .then(data => {
+                        updateScoreboard(data);
+                    })
+                    .catch(err => {
+                        console.error('Scoreboard-Fehler:', err);
+                    });
+            }, 5000);
+        </script>
+    </body>
+
+</html>

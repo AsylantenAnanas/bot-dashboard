@@ -106,49 +106,125 @@ const ClientsPage = () => {
     }
   };
 
-  // Batch action functions
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
   const startClients = async (clientIds) => {
+    setIsSelectionMode(false);
+    message.info(`Starte ${clientIds.length} ausgewählte Bots...`);
+    let successCount = 0;
+
     try {
-      const promises = clientIds.map(id =>
-        fetchWithAuth(`/clients/${id}/start`, { method: 'POST' }, navigate)
-      );
-      const responses = await Promise.all(promises);
-      const success = responses.filter(res => res.ok).length;
-      message.success(`${success} Bots gestartet`);
+      for (let i = 0; i < clientIds.length; i++) {
+        const id = clientIds[i];
+        const client = clients.find(c => c.id === id);
+        const account = accounts.find(a => a.id === client.account_id);
+        const username = account ? (account.nickname || account.username) : `ID ${id}`;
+
+        message.loading({ content: `Starte Bot ${username}...`, key: 'currentAction' });
+        const res = await fetchWithAuth(`/clients/${id}/start`, { method: 'POST' }, navigate);
+
+        if (res.ok) {
+          successCount++;
+          message.success({ content: `Bot ${username} erfolgreich gestartet!`, key: 'currentAction', duration: 2 });
+        } else {
+          message.error({ content: `Fehler beim Starten von Bot ${username}`, key: 'currentAction', duration: 2 });
+        }
+
+        if (i < clientIds.length - 1) {
+          const delaySeconds = 7;
+          for (let j = delaySeconds; j > 0; j--) {
+            message.loading({ content: `Nächster Bot startet in ${j} Sekunden...`, key: 'countdown' });
+            await delay(1000);
+          }
+          message.destroy('countdown');
+        }
+      }
+
+      message.success(`${successCount} von ${clientIds.length} Bots wurden gestartet.`);
       loadClients();
       setSelectedClientIds([]);
+
     } catch (error) {
-      message.error('Fehler beim Starten der Bots');
+      message.error('Ein unerwarteter Fehler ist beim Starten der Bots aufgetreten.');
+      loadClients();
+      setSelectedClientIds([]);
     }
   };
 
   const stopClients = async (clientIds) => {
+    setIsSelectionMode(false);
+    message.info(`Stoppe ${clientIds.length} ausgewählte Bots...`);
+    let successCount = 0;
+
     try {
-      const promises = clientIds.map(id =>
-        fetchWithAuth(`/clients/${id}/stop`, { method: 'POST' }, navigate)
-      );
-      const responses = await Promise.all(promises);
-      const success = responses.filter(res => res.ok).length;
-      message.info(`${success} Bots gestoppt`);
+      for (const id of clientIds) {
+        const client = clients.find(c => c.id === id);
+        const account = accounts.find(a => a.id === client.account_id);
+        const username = account ? (account.nickname || account.username) : `ID ${id}`;
+
+        message.loading({ content: `Stoppe Bot ${username}...`, key: 'currentAction' });
+        const res = await fetchWithAuth(`/clients/${id}/stop`, { method: 'POST' }, navigate);
+
+        if (res.ok) {
+          successCount++;
+          message.success({ content: `Bot ${username} erfolgreich gestoppt!`, key: 'currentAction', duration: 2 });
+        } else {
+          message.error({ content: `Fehler beim Stoppen von Bot ${username}`, key: 'currentAction', duration: 2 });
+        }
+        await delay(1000); // 1 second delay
+      }
+
+      message.success(`${successCount} von ${clientIds.length} Bots wurden gestoppt.`);
       loadClients();
       setSelectedClientIds([]);
+
     } catch (error) {
-      message.error('Fehler beim Stoppen der Bots');
+      message.error('Ein unerwarteter Fehler ist beim Stoppen der Bots aufgetreten.');
+      loadClients();
+      setSelectedClientIds([]);
     }
   };
 
   const rejoinClients = async (clientIds) => {
+    setIsSelectionMode(false);
+    message.info(`Starte ${clientIds.length} ausgewählte Bots neu...`);
+    let successCount = 0;
+
     try {
-      const promises = clientIds.map(id =>
-        fetchWithAuth(`/clients/${id}/rejoin`, { method: 'POST' }, navigate)
-      );
-      const responses = await Promise.all(promises);
-      const success = responses.filter(res => res.ok).length;
-      message.info(`${success} Bots neu gestartet`);
+      for (let i = 0; i < clientIds.length; i++) {
+        const id = clientIds[i];
+        const client = clients.find(c => c.id === id);
+        const account = accounts.find(a => a.id === client.account_id);
+        const username = account ? (account.nickname || account.username) : `ID ${id}`;
+
+        message.loading({ content: `Starte Bot ${username} neu...`, key: 'currentAction' });
+        const res = await fetchWithAuth(`/clients/${id}/rejoin`, { method: 'POST' }, navigate);
+
+        if (res.ok) {
+          successCount++;
+          message.success({ content: `Bot ${username} erfolgreich neu gestartet!`, key: 'currentAction', duration: 2 });
+        } else {
+          message.error({ content: `Fehler beim Neustarten von Bot ${username}`, key: 'currentAction', duration: 2 });
+        }
+
+        if (i < clientIds.length - 1) {
+          const delaySeconds = 7;
+          for (let j = delaySeconds; j > 0; j--) {
+            message.loading({ content: `Nächster Bot startet in ${j} Sekunden...`, key: 'countdown' });
+            await delay(1000);
+          }
+          message.destroy('countdown');
+        }
+      }
+
+      message.success(`${successCount} von ${clientIds.length} Bots wurden neu gestartet.`);
       loadClients();
       setSelectedClientIds([]);
+
     } catch (error) {
-      message.error('Fehler beim Neustarten der Bots');
+      message.error('Ein unerwarteter Fehler ist beim Neustarten der Bots aufgetreten.');
+      loadClients();
+      setSelectedClientIds([]);
     }
   };
 

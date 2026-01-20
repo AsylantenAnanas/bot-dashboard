@@ -4,7 +4,7 @@ const pool = require('../config/db');
 const checkAuth = require('../middleware/checkAuth');
 // Importiere beide Manager
 const javaBotManager = require('../services/botManager');
-const bedrockBotManager = require('../services/bedrockBotManager');
+const bedrockBotManager = null; //require('../services/bedrockBotManager');
 
 /**
  * Hilfsfunktion: Bestimmt den richtigen Bot-Manager anhand der Account-Edition.

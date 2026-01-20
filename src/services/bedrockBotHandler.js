@@ -1,5 +1,5 @@
 // src/services/bedrockBotHandler.js
-const mineflayer = require('mineflayer-bedrock'); // Bedrock-spezifische Version (bitte installieren: npm i mineflayer-bedrock)
+const mineflayer = require('bedrock-protocol'); // Bedrock-spezifische Version (bitte installieren: npm i mineflayer-bedrock)
 const { pathfinder, Movements, goals } = require('mineflayer-pathfinder');
 const { Vec3 } = require('vec3');
 const actionHandlers = require('./actionHandlers');

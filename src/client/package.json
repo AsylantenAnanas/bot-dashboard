@@ -3,11 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start-pm2": "pm2 start --name BotClient npm -- start"
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "keywords": [],
   "author": "",
@@ -22,7 +20,6 @@
     "react-dom": "^18.3.1",
     "react-highlight-words": "^0.20.0",
     "react-router-dom": "^7.1.1",
-    "react-scripts": "^5.0.1",
     "socket.io-client": "^4.8.1"
   },
   "browserslist": {
@@ -36,5 +33,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "vite": "^6.3.6"
   }
 }

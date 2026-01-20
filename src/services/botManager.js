@@ -1,8 +1,8 @@
 const EventEmitter = require('events');
-const { mineflayer: mineflayerViewer } = require('prismarine-viewer');
+const { fork } = require('child_process');
+const path = require('path');
 const AnsiToHtml = require('ansi-to-html');
 
-const BotHandler = require('./botHandler');
 const ansiToHtml = new AnsiToHtml();
 
 class BotManager extends EventEmitter {
@@ -28,123 +28,48 @@ class BotManager extends EventEmitter {
         messages.push(startMessage);
         this.emit(`messageUpdate:${clientId}`, startMessage);
 
-        const botHandler = new BotHandler(clientConfig);
-        const viewerPort = this.nextViewerPort++;
+        const botProcess = fork(path.join(__dirname, 'botProcess.js'));
 
-        mineflayerViewer(botHandler.bot, { port: viewerPort, firstPerson: true });
+        botProcess.send({ type: 'start', config: clientConfig });
 
-        botHandler.bot.on('rejoinTrigger', () => {
-            this.stopBot(clientId);
-            this.startBot(clientConfig);
-        });
+        botProcess.on('message', (message) => {
+            const { type, payload } = message;
 
-        botHandler.bot.on('message', (jsonMsg) => {
-            if (botHandler.isBlacklisted(jsonMsg.toString())) return;
-            const message = {
-                timestamp: new Date().toISOString(),
-                text: jsonMsg.toAnsi()
-            };
-            messages.push(message);
-            this.emit(`messageUpdate:${clientId}`, message);
-        });
-
-        botHandler.bot.on('msaCode', (msaMessage) => {
-            messages.push(msaMessage);
-            this.emit(`messageUpdate:${clientId}`, msaMessage);
-        });
-
-        botHandler.bot.on('spawn', () => {
-            const spawnMessage = {
-                timestamp: new Date().toISOString(),
-                text: `Bot ist gespawnt auf "${botHandler.serverConfig.hostname}".`
-            };
-            messages.push(spawnMessage);
-            this.emit(`messageUpdate:${clientId}`, spawnMessage);
-        });
-
-        botHandler.bot.on('playerJoined', (player) => {
-            this.emit(`playerUpdate:${clientId}`, {
-                type: 'joined',
-                player,
-                playerList: Object.keys(botHandler.bot.players),
-                playerCount: Object.keys(botHandler.bot.players).length
-            });
-        });
-
-        botHandler.bot.on('playerUpdated', (player) => {
-            this.emit(`playerUpdate:${clientId}`, {
-                type: 'updated',
-                player,
-                playerList: Object.keys(botHandler.bot.players),
-                playerCount: Object.keys(botHandler.bot.players).length
-            });
-        });
-
-        botHandler.bot.on('playerLeft', (player) => {
-            this.emit(`playerUpdate:${clientId}`, {
-                type: 'left',
-                player,
-                playerList: Object.keys(botHandler.bot.players),
-                playerCount: Object.keys(botHandler.bot.players).length
-            });
-        });
-
-        botHandler.bot.on('kicked', (reason) => {
-            let reasonText = '';
-            if (typeof reason === 'string') {
-                reasonText = reason;
-            } else if (typeof reason === 'object' && reason !== null) {
-                if (reason.value && reason.value.text && typeof reason.value.text.value === 'string') {
-                    reasonText = reason.value.text.value;
-                } else if (reason.text && typeof reason.text.value === 'string') {
-                    reasonText = reason.text.value;
-                } else {
-                    reasonText = JSON.stringify(reason, null, 2);
-                }
+            if (type === 'playerUpdate') {
+                this.emit(`playerUpdate:${clientId}`, payload);
             } else {
-                reasonText = String(reason);
+                // This is a terminal message
+                if (payload && payload.timestamp) {
+                    messages.push(payload);
+                    this.emit(`messageUpdate:${clientId}`, payload);
+                }
+
+                if (type === 'kicked' || type === 'error' || type === 'end') {
+                    if (this.bots[clientId]) {
+                        this.bots[clientId].status = 'errored';
+                    }
+                }
             }
-
-            const kickedMessage = {
-                timestamp: new Date().toISOString(),
-                text: `Bot wurde gekickt: ${reasonText}`
-            };
-            messages.push(kickedMessage);
-            this.emit(`messageUpdate:${clientId}`, kickedMessage);
-            this.bots[clientId].status = 'errored';
         });
 
-        botHandler.bot.on('error', (err) => {
-            const errorMessage = {
+        botProcess.on('exit', (code) => {
+            const exitMessage = {
                 timestamp: new Date().toISOString(),
-                text: `Bot-Error: ${err.message}`
+                text: `Bot-Prozess wurde mit Code ${code} beendet.`
             };
-            messages.push(errorMessage);
-            this.emit(`messageUpdate:${clientId}`, errorMessage);
-            this.bots[clientId].status = 'errored';
-            const statusMessage = {
-                timestamp: new Date().toISOString(),
-                text: "Status geändert auf 'errored'."
-            };
-            this.emit(`messageUpdate:${clientId}`, statusMessage);
-        });
-
-        botHandler.bot.on('end', () => {
-            const endMessage = {
-                timestamp: new Date().toISOString(),
-                text: 'Bot hat die Verbindung verloren (end).'
-            };
-            messages.push(endMessage);
-            this.emit(`messageUpdate:${clientId}`, endMessage);
-            this.bots[clientId].status = 'errored';
+            messages.push(exitMessage);
+            this.emit(`messageUpdate:${clientId}`, exitMessage);
+            if (this.bots[clientId]) {
+                this.bots[clientId].status = 'stopped';
+            }
         });
 
         this.bots[clientId] = {
-            botHandler,
+            process: botProcess,
             status: 'running',
             messages,
             config: clientConfig,
-            viewerPort
+            viewerPort: null // Viewer wird vorerst nicht unterstützt
         };
     }
 
@@ -152,8 +77,7 @@ class BotManager extends EventEmitter {
         const botData = this.bots[clientId];
         if (!botData) return;
         if (botData.status === 'running' || botData.status === 'errored') {
-            botData.botHandler.markAsStoppedByUser();
-            botData.botHandler.bot.quit();
+            botData.process.send({ type: 'stop' });
             botData.status = 'stopped';
 
             const stoppedMessage = { timestamp: new Date().toISOString(), text: 'Bot ist jetzt gestoppt.' };
@@ -180,18 +104,19 @@ class BotManager extends EventEmitter {
     }
 
     getPlayerList(clientId) {
-        if (!this.bots[clientId]) return [];
-        return this.bots[clientId].botHandler.bot.players;
+        // Diese Methode muss angepasst werden, da der Bot in einem anderen Prozess läuft.
+        // Vorerst geben wir ein leeres Array zurück.
+        return [];
     }
 
     getMaxPlayers(clientId) {
-        if (!this.bots[clientId]) return 0;
-        return this.bots[clientId].botHandler.bot.game.maxPlayers || 0;
+        // Diese Methode muss angepasst werden.
+        return 0;
     }
 
     getPlayerAmount(clientId) {
-        if (!this.bots[clientId]) return 0;
-        return this.bots[clientId].botHandler.bot.players.length;
+        // Diese Methode muss angepasst werden.
+        return 0;
     }
 
     sendChatMessage(clientId, message) {
@@ -203,7 +128,7 @@ class BotManager extends EventEmitter {
             };
             botData.messages.push(chatMessage);
             this.emit(`messageUpdate:${clientId}`, chatMessage);
-            botData.botHandler.bot.chat(message);
+            botData.process.send({ type: 'chat', payload: message });
         }
     }
 

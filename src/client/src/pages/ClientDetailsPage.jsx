@@ -737,7 +737,7 @@ const ClientDetailsPage = () => {
                 <div
                   style={{ color: '#fff', marginLeft: 8 }}
                   dangerouslySetInnerHTML={{
-                    __html: `<span style='color: #0f0'>${convertToGermanISO(m.timestamp)}:</span> ${ansiToHtmlConverter.toHtml(m.text)}`
+                    __html: `<span style='color: #0f0'>${convertToGermanISO(m.timestamp)}:</span> ${ansiToHtmlConverter.toHtml(m.text || '')}`
                   }}
                 />
               </div>
